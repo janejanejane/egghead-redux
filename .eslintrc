@@ -1,0 +1,23 @@
+{
+  "env": {
+    "browser": true,
+    "node": true,
+    "mocha": true
+  },
+  "extends": "airbnb",
+  "rules": {
+    "react/require-extension": "off",
+    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "jsx-quotes": 1,
+    "react/jsx-": 0,
+    "arrow-body-style": ["error", "always"],
+    "new-cap": ["error", {
+      "capIsNewExceptions": ["Map", "List"]
+    }],
+    "no-return-assign": 2,
+    "quote-props": ["error", "consistent", {
+      "numbers": true
+    }],
+    "space-in-parens": ["error", "always"]
+  }
+}
