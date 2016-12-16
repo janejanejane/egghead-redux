@@ -1,4 +1,6 @@
 // import { createStore } from 'redux';
+import React from 'react';
+import { render } from 'react-dom';
 import expect from 'expect';
 
 // actions that determine the store value
@@ -45,20 +47,46 @@ const createStore = ( reducer ) => {
 
 const store = createStore( counter );
 
+// dumb component, no business logic,
+// it just specifies how the app state transforms into rendered output
+const Counter = ( {
+  value,
+  onIncrement,
+  onDecrement,
+} ) => {
+  return (
+    <div>
+      <h1>{value}</h1>
+      <button onClick={onIncrement}>+</button>
+      <button onClick={onDecrement}>-</button>
+    </div>
+  );
+};
+
 // method called to change the value displayed on the body
-const render = () => {
-  document.getElementById( 'root' ).innerText = store.getState();
+const renderDisplay = () => {
+  render(
+    <Counter
+      value={store.getState()}
+      onIncrement={() => {
+        store.dispatch( {
+          type: 'INCREMENT',
+        } );
+      }}
+      onDecrement={() => {
+        store.dispatch( {
+          type: 'DECREMENT',
+        } );
+      }}
+    />,
+    document.getElementById( 'root' ),
+  );
 };
 
 // specify the change listener called every time an action is dispatched
-store.subscribe( render );
+store.subscribe( renderDisplay );
 // call on load to show value 0
-render();
-
-// add event handling on the document and use redux dispatch to update value
-document.addEventListener( 'click', () => {
-  store.dispatch( { type: 'INCREMENT' } );
-} );
+renderDisplay();
 
 // pass tests for the state actions
 expect(
