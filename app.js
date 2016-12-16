@@ -1,3 +1,4 @@
+import { createStore } from 'redux';
 import expect from 'expect';
 
 const counter = ( state = 0, action ) => {
@@ -11,6 +12,18 @@ const counter = ( state = 0, action ) => {
   }
 };
 
+const store = createStore( counter );
+
+const render = () => {
+  document.getElementById( 'root' ).innerText = store.getState();
+};
+
+store.subscribe( render );
+render();
+
+document.addEventListener( 'click', () => {
+  store.dispatch( { type: 'INCREMENT' } );
+} );
 
 expect(
   counter( 0, { type: 'INCREMENT' } ),
