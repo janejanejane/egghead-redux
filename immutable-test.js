@@ -39,6 +39,21 @@ const incrementCounter = ( list, index ) => {
   ];
 };
 
+const toggleTodo = ( todo ) => {
+  // Object.assign is new in ES6 : use polyfill
+  return Object.assign(
+    {},
+    todo,
+    { completed: !todo.completed },
+  );
+
+  // ES7 stage-2 preset
+  // return {
+  //   ...todo,
+  //   completed: !todo.completed,
+  // };
+};
+
 const testAddCounter = () => {
   const listBefore = [];
   const listAfter = [0];
@@ -75,7 +90,28 @@ const testIncrementCounter = () => {
   ).toEqual( listAfter );
 };
 
+const testToggleTodo = () => {
+  const todoBefore = {
+    id: 0,
+    text: 'Learn Redux',
+    completed: false,
+  };
+
+  const todoAfter = {
+    id: 0,
+    text: 'Learn Redux',
+    completed: true,
+  };
+
+  deepFreeze( todoBefore );
+
+  expect(
+    toggleTodo( todoBefore ),
+  ).toEqual( todoAfter );
+};
+
 testAddCounter();
 testRemoveCounter();
 testIncrementCounter();
+testToggleTodo();
 console.log( 'All tests passed.' );
