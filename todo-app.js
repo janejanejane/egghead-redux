@@ -4,13 +4,12 @@ import { render } from 'react-dom';
 import { store } from './todo';
 
 // onCLick will dispatch 'SET_VISIBILITY_FILTER' to filter the todos displayed
-const FilterLink = ( {
-  filter,
-  currentFilter,
+const Link = ( {
+  active,
   children,
   onClick,
 } ) => {
-  if ( filter === currentFilter ) {
+  if ( active ) {
     return <span>{children}</span>;
   }
   return (
@@ -18,7 +17,7 @@ const FilterLink = ( {
       href="#"
       onClick={( e ) => {
         e.preventDefault();
-        onClick( filter );
+        onClick();
       }}
     >
       {children}
@@ -26,35 +25,60 @@ const FilterLink = ( {
   );
 };
 
+class FilterLink extends Component {
+  componentDidMount() {
+    // every time the store changes, force update the render of the component
+    this.unsubscribe = store.subscribe( () => {
+      this.forceUpdate();
+    } );
+  }
+
+  componentWillUnmount() {
+    // clean up subscription
+    this.unsubscribe();
+  }
+
+  render() {
+    const props = this.props;
+    const state = store.getState();
+
+    return (
+      <Link
+        active={
+          props.filter === state.visibilityFilter
+        }
+        onClick={() => {
+          store.dispatch( {
+            type: 'SET_VISIBILITY_FILTER',
+            filter: props.filter,
+          } );
+        }}
+      >{ props.children}
+      </Link>
+    );
+  }
+}
+
 // presents all the available filter links
-const Footer = ( {
-  visibilityFilter,
-  onFilterClick,
-} ) => {
+const Footer = () => {
   return (
     <p>
       Show:
       {' '}
       <FilterLink
         filter="SHOW_ALL"
-        currentFilter={visibilityFilter}
-        onClick={onFilterClick}
       >
         All
       </FilterLink>
       {' '}
       <FilterLink
         filter="SHOW_ACTIVE"
-        currentFilter={visibilityFilter}
-        onClick={onFilterClick}
       >
         Active
       </FilterLink>
       {' '}
       <FilterLink
         filter="SHOW_COMPLETED"
-        currentFilter={visibilityFilter}
-        onClick={onFilterClick}
       >
         Completed
       </FilterLink>
@@ -105,10 +129,8 @@ const TodoList = ( {
   );
 };
 
-// onAddClick will dispatch an action of 'ADD_TODO' that will change the store
-const AddTodo = ( {
-  onAddClick,
-} ) => {
+// dispatch an action of 'ADD_TODO' that will change the store
+const AddTodo = () => {
   let input;
   return (
     <div>
@@ -119,7 +141,11 @@ const AddTodo = ( {
       />
       <button
         onClick={() => {
-          onAddClick( input.value );
+          store.dispatch( {
+            type: 'ADD_TODO',
+            id: nextTodoId++,
+            text: input.value,
+          } );
           input.value = '';
         }}
       >Add Todo</button>
@@ -146,36 +172,28 @@ const getVisibleTodos = (
   }
 };
 
-// get the existing number of todos
-let nextTodoId = store.getState().todos.length;
+class VisibleTodoList extends Component {
+  componentDidMount() {
+    // every time the store changes, force update the render of the component
+    this.unsubscribe = store.subscribe( () => {
+      this.forceUpdate();
+    } );
+  }
 
-// this is the main container that get re-rendered every time the store changes
-const TodoApp = ( {
-  // global state object keys are passed by spread operator
-  todos,
-  visibilityFilter,
-} ) => {
-  return (
-    <div>
-      {
-        // presents the input and button elements
-      }
-      <AddTodo
-        onAddClick={( text ) => {
-          store.dispatch( {
-            type: 'ADD_TODO',
-            id: nextTodoId++,
-            text,
-          } );
-        }}
-      />
-      {
-        // presents all the todos inside the store
-      }
+  componentWillUnmount() {
+    // clean up subscription
+    this.unsubscribe();
+  }
+
+  render() {
+    const props = this.props;
+    const state = store.getState();
+
+    return (
       <TodoList
         todos={getVisibleTodos(
-          todos,
-          visibilityFilter,
+          state.todos,
+          state.visibilityFilter,
         )}
         onTodoClick={( id ) => {
           store.dispatch( {
@@ -184,28 +202,35 @@ const TodoApp = ( {
           } );
         }}
       />
+    );
+  }
+}
+
+// get the existing number of todos
+let nextTodoId = store.getState().todos.length;
+
+// this is the main container that get re-rendered every time the store changes
+const TodoApp = () => {
+  return (
+    <div>
+      {
+        // presents the input and button elements
+      }
+      <AddTodo />
+      {
+        // presents all the todos inside the store
+      }
+      <VisibleTodoList />
       {
         // present the filter of todos
       }
-      <Footer
-        visibilityFilter={visibilityFilter}
-        onFilterClick={( filter ) => {
-          store.dispatch( {
-            type: 'SET_VISIBILITY_FILTER',
-            filter,
-          } );
-        }}
-      />
+      <Footer />
     </div>
   );
 };
 
-const renderTodoApp = () => {
-  render(
-    <TodoApp {...store.getState()} />,
-    document.getElementById( 'todo-app' ),
-  );
-};
-
-store.subscribe( renderTodoApp );
-renderTodoApp();
+// render once because specific components are subscribed to the store
+render(
+  <TodoApp />,
+  document.getElementById( 'todo-app' ),
+);
