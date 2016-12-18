@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PropTypes } from 'react';
 import { render } from 'react-dom';
 
 import { store } from './todo';
@@ -27,8 +27,9 @@ const Link = ( {
 
 class FilterLink extends Component {
   componentDidMount() {
+    const { passedStore } = this.context;
     // every time the store changes, force update the render of the component
-    this.unsubscribe = store.subscribe( () => {
+    this.unsubscribe = passedStore.subscribe( () => {
       this.forceUpdate();
     } );
   }
@@ -40,7 +41,8 @@ class FilterLink extends Component {
 
   render() {
     const props = this.props;
-    const state = store.getState();
+    const { passedStore } = this.context;
+    const state = passedStore.getState();
 
     return (
       <Link
@@ -48,7 +50,7 @@ class FilterLink extends Component {
           props.filter === state.visibilityFilter
         }
         onClick={() => {
-          store.dispatch( {
+          passedStore.dispatch( {
             type: 'SET_VISIBILITY_FILTER',
             filter: props.filter,
           } );
@@ -58,6 +60,11 @@ class FilterLink extends Component {
     );
   }
 }
+
+// specify the context that this component expects to receive
+FilterLink.contextTypes = {
+  passedStore: PropTypes.object,
+};
 
 // presents all the available filter links
 const Footer = () => {
@@ -130,7 +137,8 @@ const TodoList = ( {
 };
 
 // dispatch an action of 'ADD_TODO' that will change the store
-const AddTodo = () => {
+// passedStore came from grandparent
+const AddTodo = ( props, { passedStore } ) => {
   let input;
   return (
     <div>
@@ -141,7 +149,7 @@ const AddTodo = () => {
       />
       <button
         onClick={() => {
-          store.dispatch( {
+          passedStore.dispatch( {
             type: 'ADD_TODO',
             id: nextTodoId++,
             text: input.value,
@@ -151,6 +159,11 @@ const AddTodo = () => {
       >Add Todo</button>
     </div>
   );
+};
+
+// specify the context that this component expects to receive
+AddTodo.contextTypes = {
+  passedStore: PropTypes.object,
 };
 
 // helps in filtering the todos based on the option clicked
@@ -175,7 +188,8 @@ const getVisibleTodos = (
 class VisibleTodoList extends Component {
   componentDidMount() {
     // every time the store changes, force update the render of the component
-    this.unsubscribe = store.subscribe( () => {
+    const { passedStore } = this.context;
+    this.unsubscribe = passedStore.subscribe( () => {
       this.forceUpdate();
     } );
   }
@@ -187,7 +201,8 @@ class VisibleTodoList extends Component {
 
   render() {
     const props = this.props;
-    const state = store.getState();
+    const { passedStore } = this.context;
+    const state = passedStore.getState();
 
     return (
       <TodoList
@@ -196,7 +211,7 @@ class VisibleTodoList extends Component {
           state.visibilityFilter,
         )}
         onTodoClick={( id ) => {
-          store.dispatch( {
+          passedStore.dispatch( {
             type: 'TOGGLE_TODO',
             id,
           } );
@@ -205,6 +220,11 @@ class VisibleTodoList extends Component {
     );
   }
 }
+
+// specify the context that this component expects to receive
+VisibleTodoList.contextTypes = {
+  passedStore: PropTypes.object,
+};
 
 // get the existing number of todos
 let nextTodoId = store.getState().todos.length;
@@ -229,8 +249,27 @@ const TodoApp = () => {
   );
 };
 
+class Provider extends Component {
+  getChildContext() {
+    return {
+      passedStore: this.props.passedStore,
+    };
+  }
+
+  render() {
+    return this.props.children;
+  }
+}
+
+// specify child context so children can recieve value
+Provider.childContextTypes = {
+  passedStore: PropTypes.object,
+};
+
 // render once because specific components are subscribed to the store
 render(
-  <TodoApp />,
+  <Provider passedStore={store}>
+    <TodoApp />
+  </Provider>,
   document.getElementById( 'todo-app' ),
 );
