@@ -7,7 +7,8 @@
     "start-console": "nodemon app.js --exec babel-node",
     "start": "webpack-dev-server --inline --hot --port 3000",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test-immutable": "nodemon immutable-test.js --exec babel-node"
+    "test-immutable": "nodemon immutable-test.js --exec babel-node",
+    "test-todo": "nodemon todo.js --exec babel-node"
   },
   "author": "",
   "license": "ISC",
