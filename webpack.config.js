@@ -3,15 +3,23 @@ const path = require( 'path' );
 
 module.exports = {
   devtool: 'eval',
-  entry: [
-    'babel-polyfill',
-    'webpack-dev-server/client?http://localhost:3000',
-    'webpack/hot/only-dev-server',
-    './app.js',
-  ],
+  entry: {
+    'app': [
+      'babel-polyfill',
+      'webpack-dev-server/client?http://localhost:3000',
+      'webpack/hot/only-dev-server',
+      './app.js',
+    ],
+    'todo-app': [
+      // 'babel-polyfill', // to prevent 'Uncaught Error: only one instance of babel-polyfill is allowed'
+      'webpack-dev-server/client?http://localhost:3000',
+      'webpack/hot/only-dev-server',
+      './todo-app.js',
+    ],
+  },
   output: {
     path: path.join( __dirname, 'dist' ),
-    filename: 'bundle.js',
+    filename: '[name].js',
     publicPath: '/dist',
   },
   plugins: [

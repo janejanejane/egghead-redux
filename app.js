@@ -79,7 +79,7 @@ const renderDisplay = () => {
         } );
       }}
     />,
-    document.getElementById( 'root' ),
+  document.getElementById( 'app' ),
   );
 };
 

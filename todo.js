@@ -86,7 +86,8 @@ const todoApp = combineReducers( {
   visibilityFilter,
 } );
 
-const store = createStore( todoApp );
+// expose the store to be used in the react <TodoApp />
+export const store = createStore( todoApp );
 
 console.log( 'Initial state:' );
 console.log( store.getState() );
