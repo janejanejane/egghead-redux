@@ -1,13 +1,10 @@
-import { store } from './todo';
-
-// get the existing number of todos
-let nextTodoId = store.getState().todos.length;
+import { v4 } from 'node-uuid';
 
 // isolate action creators
 export const addTodo = ( text ) => {
   return {
     type: 'ADD_TODO',
-    id: nextTodoId++,
+    id: v4(), // generate uuid to avoid React error on keys
     text,
   };
 };

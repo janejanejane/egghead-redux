@@ -2,6 +2,9 @@ import deepFreeze from 'deep-freeze';
 import expect from 'expect';
 // import { combineReducers, createStore } from 'redux';
 import { createStore } from 'redux';
+import throttle from 'lodash/throttle';
+
+import { loadState, saveState } from './localStorage';
 
 const todo = ( state, action ) => {
   switch ( action.type ) {
@@ -86,47 +89,59 @@ const todoApp = combineReducers( {
   visibilityFilter,
 } );
 
+// use existing persisted data to populate the state
+const persistedState = loadState();
+
 // expose the store to be used in the react <TodoApp />
-export const store = createStore( todoApp );
+// persistedState overrides the previous state value
+export const store = createStore( todoApp, persistedState );
 
-console.log( 'Initial state:' );
-console.log( store.getState() );
-console.log( '--------------' );
+// subscribe to the changes of the store
+// ensure that writing to localStorage occurs only once per second
+store.subscribe( throttle( () => {
+  saveState( {
+    todos: store.getState().todos,
+  } );
+} ), 1000 );
 
-console.log( 'Dispatching ADD_TODO.' );
-store.dispatch( {
-  type: 'ADD_TODO',
-  id: 0,
-  text: 'Learn Redux',
-} );
-console.log( 'Current state:' );
-console.log( store.getState() );
-console.log( '--------------' );
-
-console.log( 'Dispatching ADD_TODO.' );
-store.dispatch( {
-  type: 'ADD_TODO',
-  id: 1,
-  text: 'Go shopping',
-} );
-console.log( 'Current state:' );
-console.log( store.getState() );
-console.log( '--------------' );
-
-console.log( 'Dispatching TOGGLE_TODO.' );
-store.dispatch( {
-  type: 'TOGGLE_TODO',
-  id: 0,
-} );
-console.log( 'Current state:' );
-console.log( store.getState() );
-console.log( '--------------' );
-
-console.log( 'Dispatching SET_VISIBILITY_FILTER.' );
-store.dispatch( {
-  type: 'SET_VISIBILITY_FILTER',
-  filter: 'SHOW_COMPLETED',
-} );
-console.log( 'Current state:' );
-console.log( store.getState() );
-console.log( '--------------' );
+// console.log( 'Initial state:' );
+// console.log( store.getState() );
+// console.log( '--------------' );
+//
+// console.log( 'Dispatching ADD_TODO.' );
+// store.dispatch( {
+//   type: 'ADD_TODO',
+//   id: 0,
+//   text: 'Learn Redux',
+// } );
+// console.log( 'Current state:' );
+// console.log( store.getState() );
+// console.log( '--------------' );
+//
+// console.log( 'Dispatching ADD_TODO.' );
+// store.dispatch( {
+//   type: 'ADD_TODO',
+//   id: 1,
+//   text: 'Go shopping',
+// } );
+// console.log( 'Current state:' );
+// console.log( store.getState() );
+// console.log( '--------------' );
+//
+// console.log( 'Dispatching TOGGLE_TODO.' );
+// store.dispatch( {
+//   type: 'TOGGLE_TODO',
+//   id: 0,
+// } );
+// console.log( 'Current state:' );
+// console.log( store.getState() );
+// console.log( '--------------' );
+//
+// console.log( 'Dispatching SET_VISIBILITY_FILTER.' );
+// store.dispatch( {
+//   type: 'SET_VISIBILITY_FILTER',
+//   filter: 'SHOW_COMPLETED',
+// } );
+// console.log( 'Current state:' );
+// console.log( store.getState() );
+// console.log( '--------------' );
