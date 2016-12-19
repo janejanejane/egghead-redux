@@ -4,18 +4,19 @@ import { connect } from 'react-redux';
 import { toggleTodo } from './action-creators';
 
 // helps in filtering the todos based on the option clicked
+// filter value are based on url string
 const getVisibleTodos = (
   todos,
   filter,
 ) => {
   switch ( filter ) {
-    case 'SHOW_ALL':
+    case 'all':
       return todos;
-    case 'SHOW_COMPLETED':
+    case 'completed':
       return todos.filter(
         ( t ) => { return t.completed; },
       );
-    case 'SHOW_ACTIVE':
+    case 'active':
       return todos.filter(
         ( t ) => { return !t.completed; },
       );
@@ -66,16 +67,17 @@ const TodoList = ( {
 };
 
 // maps related props data to store
-const mapStateToTodoListProps = ( state ) => {
+// todo display is based on the url using params.filter
+const mapStateToProps = ( state, ownProps ) => {
   return {
     todos: getVisibleTodos(
       state.todos,
-      state.visibilityFilter,
+      ownProps.filter,
     ),
   };
 };
 // maps dispatch to callback props
-const mapDispatchToTodoListProps = ( dispatch ) => {
+const mapDispatchToProps = ( dispatch ) => {
   return {
     onTodoClick: ( id ) => {
       dispatch( toggleTodo( id ) );
@@ -83,7 +85,9 @@ const mapDispatchToTodoListProps = ( dispatch ) => {
   };
 };
 // no need to manually subscribe because 'connect' handles it
-export const VisibleTodoList = connect(
-  mapStateToTodoListProps,
-  mapDispatchToTodoListProps,
+const VisibleTodoList = connect(
+  mapStateToProps,
+  mapDispatchToProps,
 )( TodoList );
+
+export default VisibleTodoList;

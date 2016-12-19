@@ -1,52 +1,19 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import { Link } from 'react-router';
 
-import { setVisibilityFilter } from './action-creators';
-
-// onCLick will dispatch 'SET_VISIBILITY_FILTER' to filter the todos displayed
-const Link = ( {
-  active,
-  children,
-  onClick,
-} ) => {
-  if ( active ) {
-    return <span>{children}</span>;
-  }
+// let Router control the behavior of the links
+const FilterLink = ( { filter, children } ) => {
   return (
-    <a
-      href="#"
-      onClick={( e ) => {
-        e.preventDefault();
-        onClick();
+    <Link
+      to={filter === 'all' ? '' : filter}
+      activeStyle={{
+        textDecoration: 'none',
+        color: 'black',
       }}
     >
       {children}
-    </a>
+    </Link>
   );
 };
 
-// maps related props data to store
-const mapStateToLinkProps = (
-  state,
-  ownProps,
-) => {
-  return {
-    active: ownProps.filter === state.visibilityFilter,
-  };
-};
-// maps dispatch to callback props
-const mapDispatchToLinkProps = (
-  dispatch,
-  ownProps,
-) => {
-  return {
-    onClick: () => {
-      dispatch( setVisibilityFilter( ownProps.filter ) );
-    },
-  };
-};
-// no need to manually subscribe because 'connect' handles it
-export const FilterLink = connect(
-  mapStateToLinkProps,
-  mapDispatchToLinkProps,
-)( Link );
+export default FilterLink;

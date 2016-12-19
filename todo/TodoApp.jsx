@@ -1,11 +1,12 @@
 import React from 'react';
 
 import AddTodo from './AddTodo';
-import { Footer } from './Footer';
-import { VisibleTodoList } from './VisibleTodoList';
+import Footer from './Footer';
+import VisibleTodoList from './VisibleTodoList';
 
 // this is the main container that get re-rendered every time the store changes
-export const TodoApp = () => {
+// params is passed by the react-router
+const TodoApp = ( { params } ) => {
   return (
     <div>
       {
@@ -14,8 +15,11 @@ export const TodoApp = () => {
       <AddTodo />
       {
         // presents all the todos inside the store
+        // the url will tell what type of todo to display
       }
-      <VisibleTodoList />
+      <VisibleTodoList
+        filter={params.filter || 'all'}
+      />
       {
         // present the filter of todos
       }
@@ -23,3 +27,5 @@ export const TodoApp = () => {
     </div>
   );
 };
+
+export default TodoApp;
