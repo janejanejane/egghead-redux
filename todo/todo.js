@@ -1,55 +1,6 @@
 import deepFreeze from 'deep-freeze';
 import expect from 'expect';
-// import { combineReducers, createStore } from 'redux';
-import { createStore } from 'redux';
-import throttle from 'lodash/throttle';
-
-import { loadState, saveState } from './localStorage';
-
-const todo = ( state, action ) => {
-  switch ( action.type ) {
-    case 'ADD_TODO':
-      return {
-        id: action.id,
-        text: action.text,
-        completed: false,
-      };
-    case 'TOGGLE_TODO':
-      if ( state.id !== action.id ) {
-        return state;
-      }
-
-      return {
-        ...state,
-        completed: !state.completed,
-      };
-    default:
-      return state;
-  }
-};
-
-const todos = ( state = [], action ) => {
-  switch ( action.type ) {
-    case 'ADD_TODO':
-      return [
-        ...state,
-        todo( undefined, action ),
-      ];
-    case 'TOGGLE_TODO':
-      return state.map( ( t ) => { return todo( t, action ); } );
-    default:
-      return state;
-  }
-};
-
-const visibilityFilter = ( state = 'SHOW_ALL', action ) => {
-  switch ( action.type ) {
-    case 'SET_VISIBILITY_FILTER':
-      return action.filter;
-    default:
-      return state;
-  }
-};
+import { combineReducers } from 'redux';
 
 // multiple reducers without using redux
 // const todoApp = ( state = {}, action ) => {
@@ -64,45 +15,25 @@ const visibilityFilter = ( state = 'SHOW_ALL', action ) => {
 //     ),
 //   };
 // };
-
-// combineReducers from scratch
-const combineReducers = ( reducers ) => {
-  // combineReducers will return a reducer
-  return ( state = {}, action ) => {
-    // return all the keys of the reducer
-    return Object.keys( reducers ).reduce(
-      // produce a single value
-      ( nextState, key ) => {
-        nextState[key] = reducers[key](
-          state[key],
-          action,
-        );
-        return nextState;
-      },
-      {},
-    );
-  };
-};
-
-const todoApp = combineReducers( {
-  todos,
-  visibilityFilter,
-} );
-
-// use existing persisted data to populate the state
-const persistedState = loadState();
-
-// expose the store to be used in the react <TodoApp />
-// persistedState overrides the previous state value
-export const store = createStore( todoApp, persistedState );
-
-// subscribe to the changes of the store
-// ensure that writing to localStorage occurs only once per second
-store.subscribe( throttle( () => {
-  saveState( {
-    todos: store.getState().todos,
-  } );
-} ), 1000 );
+//
+// // combineReducers from scratch
+// const combineReducers = ( reducers ) => {
+//   // combineReducers will return a reducer
+//   return ( state = {}, action ) => {
+//     // return all the keys of the reducer
+//     return Object.keys( reducers ).reduce(
+//       // produce a single value
+//       ( nextState, key ) => {
+//         nextState[key] = reducers[key](
+//           state[key],
+//           action,
+//         );
+//         return nextState;
+//       },
+//       {},
+//     );
+//   };
+// };
 
 // console.log( 'Initial state:' );
 // console.log( store.getState() );
