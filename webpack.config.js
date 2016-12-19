@@ -14,7 +14,7 @@ module.exports = {
       // 'babel-polyfill', // to prevent 'Uncaught Error: only one instance of babel-polyfill is allowed'
       'webpack-dev-server/client?http://localhost:3000',
       'webpack/hot/only-dev-server',
-      './todo-app.js',
+      './todo/todo-app.js',
     ],
   },
   output: {
