@@ -1,5 +1,6 @@
-import React, { Component, PropTypes } from 'react';
+import React from 'react';
 import { render } from 'react-dom';
+import { Provider, connect } from 'react-redux';
 
 import { store } from './todo';
 
@@ -25,46 +26,34 @@ const Link = ( {
   );
 };
 
-class FilterLink extends Component {
-  componentDidMount() {
-    const { passedStore } = this.context;
-    // every time the store changes, force update the render of the component
-    this.unsubscribe = passedStore.subscribe( () => {
-      this.forceUpdate();
-    } );
-  }
-
-  componentWillUnmount() {
-    // clean up subscription
-    this.unsubscribe();
-  }
-
-  render() {
-    const props = this.props;
-    const { passedStore } = this.context;
-    const state = passedStore.getState();
-
-    return (
-      <Link
-        active={
-          props.filter === state.visibilityFilter
-        }
-        onClick={() => {
-          passedStore.dispatch( {
-            type: 'SET_VISIBILITY_FILTER',
-            filter: props.filter,
-          } );
-        }}
-      >{ props.children}
-      </Link>
-    );
-  }
-}
-
-// specify the context that this component expects to receive
-FilterLink.contextTypes = {
-  passedStore: PropTypes.object,
+// maps related props data to store
+const mapStateToLinkProps = (
+  state,
+  ownProps,
+) => {
+  return {
+    active: ownProps.filter === state.visibilityFilter,
+  };
 };
+// maps dispatch to callback props
+const mapDispatchToLinkProps = (
+  dispatch,
+  ownProps,
+) => {
+  return {
+    onClick: () => {
+      dispatch( {
+        type: 'SET_VISIBILITY_FILTER',
+        filter: ownProps.filter,
+      } );
+    },
+  };
+};
+// no need to manually subscribe because 'connect' handles it
+const FilterLink = connect(
+  mapStateToLinkProps,
+  mapDispatchToLinkProps,
+)( Link );
 
 // presents all the available filter links
 const Footer = () => {
@@ -138,7 +127,7 @@ const TodoList = ( {
 
 // dispatch an action of 'ADD_TODO' that will change the store
 // passedStore came from grandparent
-const AddTodo = ( props, { passedStore } ) => {
+let AddTodo = ( { dispatch } ) => {
   let input;
   return (
     <div>
@@ -149,7 +138,7 @@ const AddTodo = ( props, { passedStore } ) => {
       />
       <button
         onClick={() => {
-          passedStore.dispatch( {
+          dispatch( {
             type: 'ADD_TODO',
             id: nextTodoId++,
             text: input.value,
@@ -160,11 +149,8 @@ const AddTodo = ( props, { passedStore } ) => {
     </div>
   );
 };
-
-// specify the context that this component expects to receive
-AddTodo.contextTypes = {
-  passedStore: PropTypes.object,
-};
+// no need to pass anything since mapStateToProps = null, mapDispatchToProps = dispatch
+AddTodo = connect()( AddTodo );
 
 // helps in filtering the todos based on the option clicked
 const getVisibleTodos = (
@@ -185,46 +171,31 @@ const getVisibleTodos = (
   }
 };
 
-class VisibleTodoList extends Component {
-  componentDidMount() {
-    // every time the store changes, force update the render of the component
-    const { passedStore } = this.context;
-    this.unsubscribe = passedStore.subscribe( () => {
-      this.forceUpdate();
-    } );
-  }
-
-  componentWillUnmount() {
-    // clean up subscription
-    this.unsubscribe();
-  }
-
-  render() {
-    const props = this.props;
-    const { passedStore } = this.context;
-    const state = passedStore.getState();
-
-    return (
-      <TodoList
-        todos={getVisibleTodos(
-          state.todos,
-          state.visibilityFilter,
-        )}
-        onTodoClick={( id ) => {
-          passedStore.dispatch( {
-            type: 'TOGGLE_TODO',
-            id,
-          } );
-        }}
-      />
-    );
-  }
-}
-
-// specify the context that this component expects to receive
-VisibleTodoList.contextTypes = {
-  passedStore: PropTypes.object,
+// maps related props data to store
+const mapStateToTodoListProps = ( state ) => {
+  return {
+    todos: getVisibleTodos(
+      state.todos,
+      state.visibilityFilter,
+    ),
+  };
 };
+// maps dispatch to callback props
+const mapDispatchToTodoListProps = ( dispatch ) => {
+  return {
+    onTodoClick: ( id ) => {
+      dispatch( {
+        type: 'TOGGLE_TODO',
+        id,
+      } );
+    },
+  };
+};
+// no need to manually subscribe because 'connect' handles it
+const VisibleTodoList = connect(
+  mapStateToTodoListProps,
+  mapDispatchToTodoListProps,
+)( TodoList );
 
 // get the existing number of todos
 let nextTodoId = store.getState().todos.length;
@@ -249,26 +220,10 @@ const TodoApp = () => {
   );
 };
 
-class Provider extends Component {
-  getChildContext() {
-    return {
-      passedStore: this.props.passedStore,
-    };
-  }
-
-  render() {
-    return this.props.children;
-  }
-}
-
-// specify child context so children can recieve value
-Provider.childContextTypes = {
-  passedStore: PropTypes.object,
-};
-
+// use Provider from react-redux
 // render once because specific components are subscribed to the store
 render(
-  <Provider passedStore={store}>
+  <Provider store={store}>
     <TodoApp />
   </Provider>,
   document.getElementById( 'todo-app' ),
