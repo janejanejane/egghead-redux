@@ -4,6 +4,32 @@ import { Provider, connect } from 'react-redux';
 
 import { store } from './todo';
 
+// get the existing number of todos
+let nextTodoId = store.getState().todos.length;
+
+// isolate action creators
+const addTodo = ( text ) => {
+  return {
+    type: 'ADD_TODO',
+    id: nextTodoId++,
+    text,
+  };
+};
+
+const setVisibilityFilter = ( filter ) => {
+  return {
+    type: 'SET_VISIBILITY_FILTER',
+    filter,
+  };
+};
+
+const toggleTodo = ( id ) => {
+  return {
+    type: 'TOGGLE_TODO',
+    id,
+  };
+};
+
 // onCLick will dispatch 'SET_VISIBILITY_FILTER' to filter the todos displayed
 const Link = ( {
   active,
@@ -42,10 +68,7 @@ const mapDispatchToLinkProps = (
 ) => {
   return {
     onClick: () => {
-      dispatch( {
-        type: 'SET_VISIBILITY_FILTER',
-        filter: ownProps.filter,
-      } );
+      dispatch( setVisibilityFilter( ownProps.filter ) );
     },
   };
 };
@@ -138,11 +161,7 @@ let AddTodo = ( { dispatch } ) => {
       />
       <button
         onClick={() => {
-          dispatch( {
-            type: 'ADD_TODO',
-            id: nextTodoId++,
-            text: input.value,
-          } );
+          dispatch( addTodo( input.value ) );
           input.value = '';
         }}
       >Add Todo</button>
@@ -184,10 +203,7 @@ const mapStateToTodoListProps = ( state ) => {
 const mapDispatchToTodoListProps = ( dispatch ) => {
   return {
     onTodoClick: ( id ) => {
-      dispatch( {
-        type: 'TOGGLE_TODO',
-        id,
-      } );
+      dispatch( toggleTodo( id ) );
     },
   };
 };
@@ -196,9 +212,6 @@ const VisibleTodoList = connect(
   mapStateToTodoListProps,
   mapDispatchToTodoListProps,
 )( TodoList );
-
-// get the existing number of todos
-let nextTodoId = store.getState().todos.length;
 
 // this is the main container that get re-rendered every time the store changes
 const TodoApp = () => {
