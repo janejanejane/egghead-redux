@@ -6,7 +6,6 @@ const TodoList = ( {
   todos,
   onTodoClick,
 } ) => {
-  console.log( 'what is todos:', todos );
   return (
     <ul>
       {
