@@ -3,7 +3,7 @@ import throttle from 'lodash/throttle';
 
 import { loadState, saveState } from './localStorage';
 
-import { todoApp } from './reducers';
+import todoApp from './reducers';
 
 const configureStore = () => {
   // use existing persisted data to populate the state

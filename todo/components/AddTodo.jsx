@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { addTodo } from './action-creators';
+import { addTodo } from '../actions';
 
 // dispatch an action of 'ADD_TODO' that will change the store
 // passedStore came from grandparent

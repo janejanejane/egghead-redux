@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'react-dom';
 
 import configureStore from './configureStore';
-import Root from './Root';
+import Root from './components/Root';
 
 const store = configureStore();
 // use Provider from react-redux

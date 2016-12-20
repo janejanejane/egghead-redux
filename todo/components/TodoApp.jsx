@@ -6,7 +6,7 @@ import VisibleTodoList from './VisibleTodoList';
 
 // this is the main container that get re-rendered every time the store changes
 // params is passed by the react-router
-const TodoApp = ( { params } ) => {
+const TodoApp = () => {
   return (
     <div>
       {
@@ -17,9 +17,7 @@ const TodoApp = ( { params } ) => {
         // presents all the todos inside the store
         // the url will tell what type of todo to display
       }
-      <VisibleTodoList
-        filter={params.filter || 'all'}
-      />
+      <VisibleTodoList />
       {
         // present the filter of todos
       }

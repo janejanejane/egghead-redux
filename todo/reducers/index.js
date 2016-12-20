@@ -1,6 +1,18 @@
-import deepFreeze from 'deep-freeze';
-import expect from 'expect';
+// import deepFreeze from 'deep-freeze';
+// import expect from 'expect';
 import { combineReducers } from 'redux';
+import todos, * as fromTodos from './todos';
+
+const todoApp = combineReducers( {
+  todos,
+} );
+
+export default todoApp;
+
+// named export
+export const getVisibleTodos = ( state, filter ) => {
+  return fromTodos.getVisibleTodos( state.todos, filter );
+};
 
 // multiple reducers without using redux
 // const todoApp = ( state = {}, action ) => {
