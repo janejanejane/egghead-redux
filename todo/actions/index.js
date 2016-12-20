@@ -1,5 +1,13 @@
 import { v4 } from 'node-uuid';
 
+export const receiveTodos = ( filter, response ) => {
+  return ( {
+    type: 'RECEIVE_TODOS',
+    filter,
+    response,
+  } );
+};
+
 // isolate action creators
 export const addTodo = ( text ) => {
   return {

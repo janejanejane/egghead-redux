@@ -1,37 +1,59 @@
+import React, { Component } from 'react';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import { getVisibleTodos } from '../reducers';
-import { toggleTodo } from '../actions';
+import * as actions from '../actions';
 import TodoList from './TodoList';
+import { fetchTodos } from '../api';
+
+class VisibleTodoList extends Component {
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  componentDidUpdate( prevProps ) {
+    if ( this.props.filter !== prevProps.filter ) {
+      this.fetchData();
+    }
+  }
+
+  fetchData() {
+    const { filter, receiveTodos } = this.props;
+    fetchTodos( filter ).then( ( todos ) => {
+      receiveTodos( filter, todos );
+    } );
+  }
+
+  render() {
+    const { toggleTodo, ...rest } = this.props;
+    return (
+      <TodoList
+        {...rest}
+        onTodoClick={toggleTodo}
+      />
+    );
+  }
+}
 
 // maps related props data to store
 // todo display is based on the url using params.filter
 const mapStateToProps = ( state, { params } ) => {
+  const filter = params.filter || 'all';
   return {
     todos: getVisibleTodos(
       state,
       params.filter || 'all',
     ),
+    filter,
   };
 };
-// // maps dispatch to callback props
-// const mapDispatchToProps = ( dispatch ) => {
-//   return {
-//     onTodoClick: ( id ) => {
-//       dispatch( toggleTodo( id ) );
-//     },
-//   };
-// };
+
 // no need to manually subscribe because 'connect' handles it
 // withRouter passed a 'params' argument and any props that will be used in this component,
 // no need to pass params manually from parent component
-const VisibleTodoList = withRouter( connect(
+VisibleTodoList = withRouter( connect(
   mapStateToProps,
-  {
-    // this is shorthand
-    // it is common to have the arguments passed to the method in the dispatch
-    onTodoClick: toggleTodo,
-  },
-)( TodoList ) );
+  actions,
+)( VisibleTodoList ) );
 
 export default VisibleTodoList;
