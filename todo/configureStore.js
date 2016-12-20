@@ -21,6 +21,19 @@ const addLoggingToDispatch = ( store ) => {
   /* eslint-disable no-console */
 };
 
+// redux by default only allows dispatch of plain objects
+// recognize if the response is a Promise or not
+const addPromiseSupportToDispatch = ( store ) => {
+  const rawDispatch = store.dispatch;
+  return ( action ) => {
+    if ( typeof action.then === 'function' ) {
+      return action.then( rawDispatch );
+    }
+
+    return rawDispatch;
+  };
+};
+
 const configureStore = () => {
   // expose the store to be used in the react <TodoApp />
   // persistedState overrides the previous state value
@@ -29,6 +42,8 @@ const configureStore = () => {
   if ( process.env.NODE_ENV !== 'production' ) {
     store.dispatch = addLoggingToDispatch( store );
   }
+
+  store.dispatch = addPromiseSupportToDispatch( store );
 
   return store;
 };

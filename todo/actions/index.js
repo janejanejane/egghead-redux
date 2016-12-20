@@ -1,10 +1,19 @@
 import { v4 } from 'node-uuid';
+import * as api from '../api';
 
-export const receiveTodos = ( filter, response ) => {
+const receiveTodos = ( filter, response ) => {
   return ( {
     type: 'RECEIVE_TODOS',
     filter,
     response,
+  } );
+};
+
+export const fetchTodos = ( filter ) => {
+  // returns a Promise that resolves to action object
+  return api.fetchTodos( filter ).then( ( response ) => {
+    // returns object synchronously
+    return receiveTodos( filter, response );
   } );
 };
 
