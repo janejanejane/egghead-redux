@@ -48,8 +48,12 @@ export const addTodo = ( text ) => {
 };
 
 export const toggleTodo = ( id ) => {
-  return {
-    type: 'TOGGLE_TODO',
-    id,
+  return ( dispatch ) => {
+    api.toggleTodo( id ).then( ( response ) => {
+      dispatch( {
+        type: 'TOGGLE_TODO',
+        response: normalize( response, schema.todo ),
+      } );
+    } );
   };
 };
