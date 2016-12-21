@@ -1,4 +1,6 @@
+import { normalize } from 'normalizr';
 import { getIsFetching } from '../reducers';
+import * as schema from './schema';
 import * as api from '../api';
 
 // functions returned from other functions are called thunks
@@ -20,7 +22,7 @@ export const fetchTodos = ( filter ) => {
         dispatch( {
           type: 'FETCH_TODOS_SUCCESS',
           filter,
-          response,
+          response: normalize( response, schema.arrayOfTodos ),
         } );
       },
       ( error ) => {
@@ -39,7 +41,7 @@ export const addTodo = ( text ) => {
     return api.addTodo( text ).then( ( response ) => {
       dispatch( {
         type: 'ADD_TODO_SUCCESS',
-        response,
+        response: normalize( response, schema.todo ),
       } );
     } );
   };
