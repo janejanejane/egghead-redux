@@ -1,18 +1,7 @@
 import { createStore, applyMiddleware } from 'redux';
 import createLogger from 'redux-logger';
+import thunk from 'redux-thunk';
 import todoApp from './reducers';
-
-// dispatch multiple actions asynchronously
-const thunk = ( store ) => {
-  return ( next ) => {
-    return ( action ) => {
-      return ( typeof action === 'function' ) ?
-        // pass getState() so reducer can use it
-        action( store.dispatch, store.getState ) :
-        next( action );
-    };
-  };
-};
 
 const configureStore = () => {
   // simulate a FILO overwrite to the store dispatch

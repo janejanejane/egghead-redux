@@ -22,7 +22,7 @@ export const fetchTodos = ( filter ) => {
   // passed getState from configureStore
   return ( dispatch, getState ) => {
     if ( getIsFetching( getState(), filter ) ) {
-      return;
+      return Promise.resolve();
     }
 
     dispatch( requestTodos( filter ) );
