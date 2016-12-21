@@ -1,4 +1,3 @@
-import { v4 } from 'node-uuid';
 import { getIsFetching } from '../reducers';
 import * as api from '../api';
 
@@ -36,10 +35,13 @@ export const fetchTodos = ( filter ) => {
 
 // isolate action creators
 export const addTodo = ( text ) => {
-  return {
-    type: 'ADD_TODO',
-    id: v4(), // generate uuid to avoid React error on keys
-    text,
+  return ( dispatch ) => {
+    return api.addTodo( text ).then( ( response ) => {
+      dispatch( {
+        type: 'ADD_TODO_SUCCESS',
+        response,
+      } );
+    } );
   };
 };
 

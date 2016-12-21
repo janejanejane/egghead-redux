@@ -2,14 +2,15 @@ import { combineReducers } from 'redux';
 
 const createList = ( filter ) => {
   const ids = ( state = [], action ) => {
-    // return data from server
-    if ( action.filter !== filter ) {
-      return state;
-    }
-    console.log( 'action:', action );
     switch ( action.type ) {
       case 'FETCH_TODOS_SUCCESS':
-        return action.response.map( ( todo ) => { return todo.id; } );
+        return filter === action.filter ?
+          action.response.map( ( todo ) => { return todo.id; } ) :
+          state;
+      case 'ADD_TODO_SUCCESS':
+        return filter !== 'completed' ?
+          [...state, action.response.id] :
+          state;
       default:
         return state;
     }

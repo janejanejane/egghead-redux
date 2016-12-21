@@ -22,6 +22,27 @@ const delay = ( ms ) => {
   } );
 };
 
+export const addTodo = ( text ) => {
+  return delay( 500 ).then( () => {
+    const todo = {
+      id: v4(),
+      text,
+      completed: false,
+    };
+    fakeDatabase.todos.push( todo );
+    return todo;
+  } );
+};
+
+
+export const toggleTodo = ( id ) => {
+  return delay( 500 ).then( () => {
+    const todo = fakeDatabase.todos.find( ( t ) => { return t.id === id; } );
+    todo.completed = !todo.completed;
+    return todo;
+  } );
+};
+
 export const fetchTodos = ( filter ) => {
   return delay( 500 ).then( () => {
     if ( Math.random() > 0.5 ) {
