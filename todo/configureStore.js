@@ -1,11 +1,21 @@
 import { createStore, applyMiddleware } from 'redux';
-import promise from 'redux-promise';
 import createLogger from 'redux-logger';
 import todoApp from './reducers';
 
+// dispatch multiple actions asynchronously
+const thunk = ( store ) => {
+  return ( next ) => {
+    return ( action ) => {
+      return ( typeof action === 'function' ) ?
+        action( store.dispatch ) :
+        next( action );
+    };
+  };
+};
+
 const configureStore = () => {
   // simulate a FILO overwrite to the store dispatch
-  const middlewares = [promise];
+  const middlewares = [thunk];
 
   if ( process.env.NODE_ENV !== 'production' ) {
     middlewares.push( createLogger() );

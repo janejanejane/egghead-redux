@@ -1,7 +1,7 @@
 import { v4 } from 'node-uuid';
 import * as api from '../api';
 
-export const requestTodos = ( filter ) => {
+const requestTodos = ( filter ) => {
   return ( {
     type: 'REQUEST_TODOS',
     filter,
@@ -16,13 +16,20 @@ const receiveTodos = ( filter, response ) => {
   } );
 };
 
+// functions returned from other functions are called thunks
 export const fetchTodos = ( filter ) => {
-  // returns a Promise that resolves to action object
-  return api.fetchTodos( filter ).then( ( response ) => {
-    console.log( response, '???response ???' );
-    // returns object synchronously
-    return receiveTodos( filter, response );
-  } );
+  return ( dispatch ) => {
+    if ( getIsFetching( filter ) ) {
+      return;
+    }
+
+    dispatch( requestTodos( filter ) );
+    // returns a Promise that resolves to action object
+    return api.fetchTodos( filter ).then( ( response ) => {
+      // returns object synchronously
+      dispatch( receiveTodos( filter, response ) );
+    } );
+  };
 };
 
 // isolate action creators
