@@ -20,5 +20,9 @@ export default todos;
 // avoid storing in-memory at once
 export const getVisibleTodos = ( state, filter ) => {
   const ids = fromList.getIds( state.listByFilter[filter] );
-  return ids.map( ( id ) => { return fromById( state.byId, id ); } );
+  return ids.map( ( id ) => { return fromById.getTodo( state.byId, id ); } );
+};
+
+export const getIsFetching = ( state, filter ) => {
+  return fromList.getIsFetching( state.listByFilter[filter] );
 };
