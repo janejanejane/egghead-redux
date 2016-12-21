@@ -2,7 +2,7 @@
 // specify a database-like syntax of state
 const byId = ( state = {}, action ) => {
   switch ( action.type ) {
-    case 'RECEIVE_TODOS':
+    case 'FETCH_TODOS_SUCCESS':
       const nexState = { ...state };
       action.response.forEach( ( todo ) => {
         nexState[todo.id] = todo;
