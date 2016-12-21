@@ -7,7 +7,8 @@ const thunk = ( store ) => {
   return ( next ) => {
     return ( action ) => {
       return ( typeof action === 'function' ) ?
-        action( store.dispatch ) :
+        // pass getState() so reducer can use it
+        action( store.dispatch, store.getState ) :
         next( action );
     };
   };

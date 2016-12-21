@@ -1,4 +1,5 @@
 import { v4 } from 'node-uuid';
+import { getIsFetching } from '../reducers';
 import * as api from '../api';
 
 const requestTodos = ( filter ) => {
@@ -18,8 +19,9 @@ const receiveTodos = ( filter, response ) => {
 
 // functions returned from other functions are called thunks
 export const fetchTodos = ( filter ) => {
-  return ( dispatch ) => {
-    if ( getIsFetching( filter ) ) {
+  // passed getState from configureStore
+  return ( dispatch, getState ) => {
+    if ( getIsFetching( getState(), filter ) ) {
       return;
     }
 
